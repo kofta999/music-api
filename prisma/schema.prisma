@@ -22,6 +22,8 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   password  String
+
+  playlists  Playlist[]
   // Session       Session[]
   // Account       Account[]
 
@@ -63,3 +65,74 @@ model User {
 
 //   @@map("verification")
 // }
+
+model Song {
+  id         String   @id @default(uuid())
+  title      String
+  artistId   String
+  artist     Artist   @relation(fields: [artistId], references: [id])
+  albumId    String?
+  album      Album?   @relation(fields: [albumId], references: [id])
+  duration   Int      // Duration in seconds
+  genre      String?
+  releaseDate DateTime
+  audioUrl   String
+  coverArt   String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  playlists  PlaylistSong[]
+
+  @@map("song")
+}
+
+model Artist {
+  id        String   @id @default(uuid())
+  name      String
+  bio       String?
+  imageUrl  String?
+  songs     Song[]
+  albums    Album[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("artist")
+}
+
+model Album {
+  id        String   @id @default(uuid())
+  title     String
+  artistId  String
+  artist    Artist   @relation(fields: [artistId], references: [id])
+  releaseDate DateTime
+  coverArt  String?
+  songs     Song[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("album")
+}
+
+model Playlist {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  songs       PlaylistSong[]
+
+  @@map("playlist")
+}
+
+model PlaylistSong {
+  id         String   @id @default(uuid())
+  playlistId String
+  playlist   Playlist @relation(fields: [playlistId], references: [id])
+  songId     String
+  song       Song     @relation(fields: [songId], references: [id])
+  addedAt    DateTime @default(now())
+
+  @@unique([playlistId, songId])
+  @@map("playlist_song")
+}

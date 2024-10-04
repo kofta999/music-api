@@ -1,6 +1,6 @@
 import { Elysia } from "elysia";
 import { swagger } from "@elysiajs/swagger";
-import { authController, authorizer } from "./controllers/auth/index.js";
+import { authController, authorizer } from "./controllers/auth";
 
 const app = new Elysia()
   .use(swagger())
