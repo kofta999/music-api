@@ -1,15 +1,13 @@
 import { Elysia } from "elysia";
 import { swagger } from "@elysiajs/swagger";
-import { authController, authorizer } from "./controllers/auth";
+import { authController } from "./controllers/auth";
+import { songsController } from "./controllers/songs";
+import { staticPlugin } from "@elysiajs/static";
 
 const app = new Elysia()
   .use(swagger())
-  .group("/api", (app) =>
-    app
-      .use(authController)
-      .use(authorizer)
-      .get("/", ({ userId }) => `Hello ${userId}`),
-  )
+  .use(staticPlugin())
+  .group("/api", (app) => app.use(authController).use(songsController))
   .listen(3000);
 
 console.log(
