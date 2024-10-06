@@ -3,9 +3,9 @@ import prisma from "../../lib/db";
 import jwt from "@elysiajs/jwt";
 
 const signUpModel = t.Object({
-  email: t.String(),
-  password: t.String(),
-  name: t.String(),
+  email: t.String({ description: "User's email address" }),
+  password: t.String({ description: "User's password" }),
+  name: t.String({ description: "User's full name" }),
 });
 
 const jwtController = new Elysia({ name: "jwtController" }).use(
@@ -17,7 +17,9 @@ const jwtController = new Elysia({ name: "jwtController" }).use(
   }),
 );
 
-export const authorizer = new Elysia({ name: "user/auth" })
+export const authorizer = new Elysia({
+  name: "user/auth",
+})
   .use(jwtController)
   .resolve({ as: "scoped" }, async ({ headers, jwt, error }) => {
     const authHeader = headers.authorization;
@@ -44,14 +46,17 @@ export const authorizer = new Elysia({ name: "user/auth" })
     return { userId: result.sub };
   });
 
-export const authController = new Elysia({ prefix: "/auth" })
+export const authController = new Elysia({
+  prefix: "/auth",
+  tags: ["Authentication"],
+})
   .use(jwtController)
   .decorate("prisma", prisma)
   .model("sign-up", signUpModel)
   .model("sign-in", t.Omit(signUpModel, ["name"]))
   .post(
     "/sign-up",
-    async ({ body: { email, name, password }, error, prisma }) => {
+    async ({ body: { email, name, password }, error, prisma, set }) => {
       const isUserExist = await prisma.user.findUnique({ where: { email } });
 
       if (isUserExist) {
@@ -69,10 +74,17 @@ export const authController = new Elysia({ prefix: "/auth" })
         select: { id: true },
       });
 
+      set.status = "Created";
+
       return { userId: newUser.id };
     },
     {
       body: "sign-up",
+      detail: {
+        summary: "Register a new user",
+        description: "Create a new user account with email, password, and name",
+        tags: ["Authentication"],
+      },
     },
   )
   .post(
@@ -99,5 +111,11 @@ export const authController = new Elysia({ prefix: "/auth" })
     },
     {
       body: "sign-in",
+      detail: {
+        summary: "Authenticate a user",
+        description:
+          "Authenticate a user with email and password, and return a JWT token",
+        tags: ["Authentication"],
+      },
     },
   );
