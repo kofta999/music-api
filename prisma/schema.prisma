@@ -16,7 +16,8 @@ datasource db {
 model User {
   id        String   @id @default(uuid())
   name      String
-  email     String
+  email     String   @unique
+  publicId  String   @unique
   // emailVerified Boolean
   image     String?
   createdAt DateTime @default(now())
@@ -28,7 +29,6 @@ model User {
   // Session       Session[]
   // Account       Account[]
 
-  @@unique([email])
   @@map("user")
 }
 
@@ -69,6 +69,7 @@ model User {
 
 model Song {
   id          String         @id @default(uuid())
+  publicId    String         @unique
   title       String
   artistId    String
   artist      Artist         @relation(fields: [artistId], references: [id])
@@ -88,6 +89,7 @@ model Song {
 
 model Artist {
   id        String   @id @default(uuid())
+  publicId  String   @unique
   name      String
   bio       String?
   imageUrl  String?
@@ -102,6 +104,7 @@ model Artist {
 
 model Album {
   id          String   @id @default(uuid())
+  publicId    String   @unique
   title       String
   artistId    String
   artist      Artist   @relation(fields: [artistId], references: [id])
@@ -116,6 +119,7 @@ model Album {
 
 model Playlist {
   id          String         @id @default(uuid())
+  publicId    String         @unique
   name        String
   description String?
   userId      String

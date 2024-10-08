@@ -1,6 +1,7 @@
 import { Elysia, t } from "elysia";
 import prisma from "../../lib/db";
 import jwt from "@elysiajs/jwt";
+import { generateNanoid } from "../../lib/utils";
 
 const signUpModel = t.Object({
   email: t.String({ description: "User's email address" }),
@@ -70,6 +71,7 @@ export const authController = new Elysia({
           name,
           email,
           password,
+          publicId: generateNanoid(),
         },
         select: { id: true },
       });

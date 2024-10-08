@@ -1,6 +1,7 @@
 import { Elysia, t } from "elysia";
 import prisma from "../../lib/db";
 import { authorizer } from "../auth";
+import { generateNanoid } from "../../lib/utils";
 
 export const playlistsController = new Elysia({
   prefix: "/playlists",
@@ -66,6 +67,7 @@ export const playlistsController = new Elysia({
           name: body.name,
           description: body.description,
           userId,
+          publicId: generateNanoid(),
         },
       });
 
