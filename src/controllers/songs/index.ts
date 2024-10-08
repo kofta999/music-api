@@ -1,5 +1,7 @@
 import Elysia, { t } from "elysia";
 import prisma from "../../lib/db";
+import { authorizer } from "../auth";
+import { SongModels } from "./models";
 
 export const songsController = new Elysia({
   prefix: "/songs",
@@ -9,25 +11,50 @@ export const songsController = new Elysia({
   },
 })
   .decorate("prisma", prisma)
+  .model(SongModels)
   .get(
     "/search",
-    async ({ query: { query }, prisma }) => {
-      // TODO: Pagination
-
+    async ({ query: { query, page }, prisma }) => {
       const results = await prisma.song.findMany({
         where: {
-          // TODO: Add search by artist etc
-          OR: [{ title: { contains: query } }],
+          OR: [
+            { title: { contains: query } },
+            { artist: { name: { contains: query } } },
+            { album: { title: { contains: query } } },
+          ],
         },
+        skip: 10 * (page - 1),
         take: 10,
+        select: {
+          publicId: true,
+          title: true,
+          duration: true,
+          genre: true,
+          releaseDate: true,
+          coverArt: true,
+          artist: {
+            select: {
+              publicId: true,
+              name: true,
+            },
+          },
+          album: {
+            select: {
+              publicId: true,
+              title: true,
+            },
+          },
+        },
       });
 
-      return { results };
+      return results;
     },
     {
-      query: t.Object({
-        query: t.String({ description: "Search query for song titles" }),
-      }),
+      query: "searchQuery",
+      response: {
+        200: "searchResults",
+        400: t.String(),
+      },
       detail: {
         summary: "Search for songs",
         description: "Search for songs based on a query string",
@@ -37,19 +64,42 @@ export const songsController = new Elysia({
   .get(
     "/:id",
     async ({ params: { id }, prisma, error }) => {
-      // TODO: Add more fetch details
-      const song = await prisma.song.findUnique({ where: { id } });
+      const song = await prisma.song.findUnique({
+        where: { id },
+        select: {
+          publicId: true,
+          title: true,
+          duration: true,
+          genre: true,
+          releaseDate: true,
+          coverArt: true,
+          artist: {
+            select: {
+              publicId: true,
+              name: true,
+            },
+          },
+          album: {
+            select: {
+              publicId: true,
+              title: true,
+            },
+          },
+        },
+      });
 
       if (!song) {
-        return error("Not Found");
+        return error(404, "Song with ID does not exist");
       }
 
       return song;
     },
     {
-      params: t.Object({
-        id: t.String({ description: "The ID of the song" }),
-      }),
+      params: "songId",
+      response: {
+        200: "songDetails",
+        404: t.String(),
+      },
       detail: {
         summary: "Get a song by ID",
         description: "Retrieve detailed information about a specific song",
@@ -115,16 +165,8 @@ export const songsController = new Elysia({
       return new Response(file.slice(start, end));
     },
     {
-      params: t.Object({
-        id: t.String({ description: "The ID of the song to stream" }),
-      }),
-      headers: t.Object({
-        range: t.Optional(
-          t.String({
-            description: "Range header for partial content requests",
-          }),
-        ),
-      }),
+      params: "songId",
+      headers: "streamHeaders",
       detail: {
         summary: "Stream a song",
         description:
@@ -150,4 +192,8 @@ export const songsController = new Elysia({
         },
       },
     },
-  );
+  )
+  .use(authorizer)
+  .post(":id/record", async ({ params: { id }, userId }) => {
+    // TODO
+  });

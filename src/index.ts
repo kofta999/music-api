@@ -1,10 +1,10 @@
 import { Elysia } from "elysia";
+import { staticPlugin } from "@elysiajs/static";
+import { swaggerConfig } from "./lib/swagger";
 import { swagger } from "@elysiajs/swagger";
 import { authController } from "./controllers/auth";
 import { songsController } from "./controllers/songs";
-import { staticPlugin } from "@elysiajs/static";
 import { playlistsController } from "./controllers/playlists";
-import { swaggerConfig } from "./lib/swagger";
 import { artistsController } from "./controllers/artists";
 
 const app = new Elysia()
