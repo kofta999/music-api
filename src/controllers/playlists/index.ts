@@ -84,7 +84,6 @@ export const playlistsController = new Elysia({
   .put(
     "/:id",
     async ({ body, params: { id }, userId, prisma, error }) => {
-      // TODO: Check if that actually works
       const playlist = await prisma.playlist.findUnique({
         where: { id, userId },
       });

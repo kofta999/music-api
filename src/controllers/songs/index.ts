@@ -51,10 +51,9 @@ export const songsController = new Elysia({
     },
     {
       query: "searchQuery",
-      response: {
-        200: "searchResults",
-        400: t.String(),
-      },
+      // response: {
+      //   200: "searchResults",
+      // },
       detail: {
         summary: "Search for songs",
         description: "Search for songs based on a query string",
@@ -96,10 +95,10 @@ export const songsController = new Elysia({
     },
     {
       params: "songId",
-      response: {
-        200: "songDetails",
-        404: t.String(),
-      },
+      // response: {
+      //   200: "songDetails",
+      //   404: t.String(),
+      // },
       detail: {
         summary: "Get a song by ID",
         description: "Retrieve detailed information about a specific song",
