@@ -30,7 +30,7 @@ export const SongModels = {
     page: t.Number({ default: 1 }),
   }),
   songId: t.Object({
-    id: t.String({ description: "The ID of the song" }),
+    publicId: t.String({ description: "The public ID of the song" }),
   }),
   streamHeaders: t.Object({
     range: t.Optional(

@@ -36,9 +36,11 @@ export const playlistsController = new Elysia({
   )
   .decorate("prisma", prisma)
   .get(
-    "/:id",
-    async ({ params: { id }, error }) => {
-      const playlist = await prisma.playlist.findUnique({ where: { id } });
+    "/:publicId",
+    async ({ params: { publicId }, error }) => {
+      const playlist = await prisma.playlist.findUnique({
+        where: { publicId },
+      });
 
       if (!playlist) {
         return error("Not Found");
@@ -53,7 +55,7 @@ export const playlistsController = new Elysia({
         description: "Retrieve details of a specific playlist",
       },
       params: t.Object({
-        id: t.String({ description: "The ID of the playlist" }),
+        publicId: t.String({ description: "The public ID of the playlist" }),
       }),
     },
   )
@@ -61,7 +63,7 @@ export const playlistsController = new Elysia({
   .post(
     "/",
     async ({ body, prisma, userId }) => {
-      // TODO: Add ability to add songs id (pre-populated playlist)
+      // TODO: Add ability to add songs publicId (pre-populated playlist)
       const playlist = await prisma.playlist.create({
         data: {
           name: body.name,
@@ -71,7 +73,7 @@ export const playlistsController = new Elysia({
         },
       });
 
-      return { playlistId: playlist.id };
+      return { playlistId: playlist.publicId };
     },
     {
       body: "new-playlist",
@@ -82,24 +84,24 @@ export const playlistsController = new Elysia({
     },
   )
   .put(
-    "/:id",
-    async ({ body, params: { id }, userId, prisma, error }) => {
+    "/:publicId",
+    async ({ body, params: { publicId }, userId, prisma, error }) => {
       const playlist = await prisma.playlist.findUnique({
-        where: { id, userId },
+        where: { publicId, userId },
       });
 
       if (!playlist) {
         return error("Forbidden");
       }
 
-      await prisma.playlist.update({ where: { id }, data: body });
+      await prisma.playlist.update({ where: { publicId }, data: body });
 
-      return { id };
+      return { publicId };
     },
     {
       body: "edit-playlist",
       params: t.Object({
-        id: t.String({ description: "The ID of the playlist to update" }),
+        publicId: t.String({ description: "The ID of the playlist to update" }),
       }),
       detail: {
         summary: "Update a playlist",
@@ -108,10 +110,10 @@ export const playlistsController = new Elysia({
     },
   )
   .delete(
-    "/:id",
-    async ({ params: { id }, userId, prisma, error, set }) => {
+    "/:publicId",
+    async ({ params: { publicId }, userId, prisma, error, set }) => {
       const playlist = await prisma.playlist.findUnique({
-        where: { id, userId },
+        where: { publicId, userId },
       });
 
       if (!playlist) {
@@ -119,14 +121,14 @@ export const playlistsController = new Elysia({
       }
 
       await prisma.playlist.delete({
-        where: { id },
+        where: { publicId },
       });
 
       set.status = "No Content";
     },
     {
       params: t.Object({
-        id: t.String({ description: "The ID of the playlist to delete" }),
+        publicId: t.String({ description: "The ID of the playlist to delete" }),
       }),
       detail: {
         summary: "Delete a playlist",
@@ -135,21 +137,21 @@ export const playlistsController = new Elysia({
     },
   )
   .post(
-    "/:id/songs/",
+    "/:publicId/songs/",
     async ({
       prisma,
       body: { songId },
       userId,
       error,
-      params: { id },
+      params: { publicId },
       set,
     }) => {
       const playlist = await prisma.playlist.findUnique({
-        where: { id, userId },
+        where: { publicId, userId },
       });
 
       const song = await prisma.song.findUnique({
-        where: { id: songId },
+        where: { publicId: songId },
       });
 
       if (!playlist) {
@@ -157,10 +159,12 @@ export const playlistsController = new Elysia({
       }
 
       if (!song) {
-        error("Not Found");
+        return error("Not Found");
       }
 
-      await prisma.playlistSong.create({ data: { songId, playlistId: id } });
+      await prisma.playlistSong.create({
+        data: { songId: song.id, playlistId: playlist.id },
+      });
 
       set.status = "Created";
 
@@ -173,7 +177,7 @@ export const playlistsController = new Elysia({
         }),
       }),
       params: t.Object({
-        id: t.String({ description: "The ID of the playlist" }),
+        publicId: t.String({ description: "The ID of the playlist" }),
       }),
       detail: {
         summary: "Add a song to a playlist",
@@ -182,20 +186,28 @@ export const playlistsController = new Elysia({
     },
   )
   .delete(
-    "/:id/songs/:songId",
-    async ({ set, prisma, params: { id, songId }, userId, error }) => {
+    "/:publicId/songs/:songId",
+    async ({ set, prisma, params: { publicId, songId }, userId, error }) => {
       const playlist = await prisma.playlist.findUnique({
-        where: { id, userId },
+        where: { publicId, userId },
+      });
+
+      const song = await prisma.song.findUnique({
+        where: { publicId: songId },
       });
 
       if (!playlist) {
-        return error(403, "Forbidden");
+        return error("Forbidden");
+      }
+
+      if (!song) {
+        return error("Not Found");
       }
 
       const playlistSong = await prisma.playlistSong.deleteMany({
         where: {
-          playlistId: id,
-          songId: songId,
+          playlistId: playlist.id,
+          songId: song.id,
         },
       });
 
@@ -207,7 +219,7 @@ export const playlistsController = new Elysia({
     },
     {
       params: t.Object({
-        id: t.String({ description: "The ID of the playlist" }),
+        publicId: t.String({ description: "The ID of the playlist" }),
         songId: t.String({
           description: "The ID of the song to remove from the playlist",
         }),

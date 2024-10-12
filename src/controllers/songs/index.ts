@@ -61,10 +61,10 @@ export const songsController = new Elysia({
     },
   )
   .get(
-    "/:id",
-    async ({ params: { id }, prisma, error }) => {
+    "/:publicId",
+    async ({ params: { publicId }, prisma, error }) => {
       const song = await prisma.song.findUnique({
-        where: { id },
+        where: { publicId },
         select: {
           publicId: true,
           title: true,
@@ -109,7 +109,7 @@ export const songsController = new Elysia({
     "/:id/stream",
     async function ({ request, params, set }) {
       const CHUNK_SIZE = 256 * 1024;
-      const songId = params.id;
+      const songId = params.publicId;
       const audioUrl = `./public/${songId}.mp3`;
       const file = Bun.file(audioUrl);
 
@@ -193,6 +193,30 @@ export const songsController = new Elysia({
     },
   )
   .use(authorizer)
-  .post(":id/record", async ({ params: { id }, userId }) => {
-    // TODO
-  });
+  .post(
+    ":publicId/record",
+    async ({ params: { publicId }, userId, error }) => {
+      let song = await prisma.song.findUnique({
+        where: { publicId },
+        select: { id: true },
+      });
+
+      if (!song) {
+        return error(404);
+      }
+
+      await prisma.listeningHistory.upsert({
+        where: {
+          userId_songId: {
+            songId: song.id,
+            userId: userId,
+          },
+        },
+        create: { songId: song.id, userId },
+        update: { updatedAt: new Date() }, // Set updatedAt to current timestamp
+      });
+    },
+    {
+      params: "songId",
+    },
+  );

@@ -24,8 +24,9 @@ model User {
   updatedAt DateTime @updatedAt
   password  String
 
-  playlists       Playlist[]
-  followedArtists Follow[]
+  playlists        Playlist[]
+  followedArtists  Follow[]
+  listeningHistory ListeningHistory[]
   // Session       Session[]
   // Account       Account[]
 
@@ -68,27 +69,28 @@ model User {
 // }
 
 model Song {
-  id          String         @id @default(uuid())
-  publicId    String         @unique
-  title       String
-  artistId    String
-  artist      Artist         @relation(fields: [artistId], references: [id])
-  albumId     String?
-  album       Album?         @relation(fields: [albumId], references: [id])
-  duration    Int // Duration in seconds
-  genre       String?
-  releaseDate DateTime
-  audioUrl    String
-  coverArt    String?
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
-  playlists   PlaylistSong[]
+  id               Int                @id @default(autoincrement())
+  publicId         String             @unique
+  title            String
+  artistId         Int
+  artist           Artist             @relation(fields: [artistId], references: [id])
+  albumId          Int?
+  album            Album?             @relation(fields: [albumId], references: [id])
+  duration         Int // Duration in seconds
+  genre            String?
+  releaseDate      DateTime
+  audioUrl         String
+  coverArt         String?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  playlists        PlaylistSong[]
+  ListeningHistory ListeningHistory[]
 
   @@map("song")
 }
 
 model Artist {
-  id        String   @id @default(uuid())
+  id        Int      @id @default(autoincrement())
   publicId  String   @unique
   name      String
   bio       String?
@@ -103,10 +105,10 @@ model Artist {
 }
 
 model Album {
-  id          String   @id @default(uuid())
+  id          Int      @id @default(autoincrement())
   publicId    String   @unique
   title       String
-  artistId    String
+  artistId    Int
   artist      Artist   @relation(fields: [artistId], references: [id])
   releaseDate DateTime
   coverArt    String?
@@ -118,7 +120,7 @@ model Album {
 }
 
 model Playlist {
-  id          String         @id @default(uuid())
+  id          Int            @id @default(autoincrement())
   publicId    String         @unique
   name        String
   description String?
@@ -132,10 +134,10 @@ model Playlist {
 }
 
 model PlaylistSong {
-  id         String   @id @default(uuid())
-  playlistId String
+  id         Int      @id @default(autoincrement())
+  playlistId Int
   playlist   Playlist @relation(fields: [playlistId], references: [id])
-  songId     String
+  songId     Int
   song       Song     @relation(fields: [songId], references: [id])
   addedAt    DateTime @default(now())
 
@@ -144,13 +146,25 @@ model PlaylistSong {
 }
 
 model Follow {
-  id        String   @id @default(uuid())
+  id        Int      @id @default(autoincrement())
   userId    String
   user      User     @relation(fields: [userId], references: [id])
-  artistId  String
+  artistId  Int
   artist    Artist   @relation(fields: [artistId], references: [id])
   createdAt DateTime @default(now())
 
   @@unique([userId, artistId])
   @@map("follow")
+}
+
+model ListeningHistory {
+  id        Int      @id @default(autoincrement())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  songId    Int
+  Song      Song     @relation(fields: [songId], references: [id])
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, songId])
+  @@map("listening_history")
 }

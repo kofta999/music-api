@@ -40,7 +40,7 @@ export const artistsController = new Elysia({
     "/:publicId",
     async ({ params: { publicId }, prisma, error, userId, set }) => {
       const artist = await prisma.artist.findUnique({
-        where: { id: publicId },
+        where: { publicId },
       });
 
       if (!artist) {
@@ -48,12 +48,12 @@ export const artistsController = new Elysia({
       }
 
       const result = await prisma.follow.deleteMany({
-        where: { userId, artistId: publicId },
+        where: { userId, artistId: artist.id },
       });
 
       if (result.count == 0) {
         await prisma.follow.create({
-          data: { artistId: publicId, userId },
+          data: { artistId: artist.id, userId },
         });
 
         set.status = "Created";

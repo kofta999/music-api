@@ -5,21 +5,18 @@ const prisma = new PrismaClient();
 
 const artists = [
   {
-    id: "a1b2c3d4-e5f6-4321-8765-9abc87654321",
     publicId: nanoid(21),
     name: "The Melodic Waves",
     bio: "An indie rock band known for their atmospheric sounds and introspective lyrics.",
     imageUrl: "http://localhost:3000/public/default.png",
   },
   {
-    id: "b2c3d4e5-f6a7-5432-8765-0bcd98765432",
     publicId: nanoid(21),
     name: "Elettra",
     bio: "Electronic music producer pushing the boundaries of synth-pop.",
     imageUrl: "http://localhost:3000/public/default.png",
   },
   {
-    id: "c3d4e5f6-a7b8-6543-8765-1cde09876543",
     publicId: nanoid(21),
     name: "Jazz Collective",
     bio: "A group of seasoned jazz musicians known for their improvisational skills.",
@@ -30,26 +27,23 @@ const artists = [
 // Albums
 const albums = [
   {
-    id: "d4e5f6a7-b8c9-7654-8765-2def10987654",
     publicId: nanoid(21),
     title: "Echoes of Tomorrow",
-    artistId: "a1b2c3d4-e5f6-4321-8765-9abc87654321",
+    artistId: 1, // Assuming the first artist will have ID 1
     releaseDate: new Date("2022-03-15"),
     coverArt: "http://localhost:3000/public/default.png",
   },
   {
-    id: "e5f6a7b8-c9d0-8765-8765-3efg21098765",
     publicId: nanoid(21),
     title: "Neon Dreams",
-    artistId: "b2c3d4e5-f6a7-5432-8765-0bcd98765432",
+    artistId: 2, // Assuming the second artist will have ID 2
     releaseDate: new Date("2023-07-22"),
     coverArt: "http://localhost:3000/public/default.png",
   },
   {
-    id: "f6a7b8c9-d0e1-9876-8765-4ghi32109876",
     publicId: nanoid(21),
     title: "Midnight Sessions",
-    artistId: "c3d4e5f6-a7b8-6543-8765-1cde09876543",
+    artistId: 3, // Assuming the third artist will have ID 3
     releaseDate: new Date("2021-11-30"),
     coverArt: "http://localhost:3000/public/default.png",
   },
@@ -58,11 +52,10 @@ const albums = [
 // Songs
 const songs = [
   {
-    id: "g7h8i9j0-k1l2-0987-8765-5hij43210987",
     publicId: nanoid(21),
     title: "Whispers in the Wind",
-    artistId: "a1b2c3d4-e5f6-4321-8765-9abc87654321",
-    albumId: "d4e5f6a7-b8c9-7654-8765-2def10987654",
+    artistId: 1, // Assuming the first artist will have ID 1
+    albumId: 1, // Assuming the first album will have ID 1
     duration: 245, // 4:05
     genre: "Indie Rock",
     releaseDate: new Date("2022-03-15"),
@@ -70,11 +63,10 @@ const songs = [
     coverArt: "http://localhost:3000/public/default.png",
   },
   {
-    id: "h8i9j0k1-l2m3-1098-8765-6ijk54321098",
     publicId: nanoid(21),
     title: "Neon Nights",
-    artistId: "b2c3d4e5-f6a7-5432-8765-0bcd98765432",
-    albumId: "e5f6a7b8-c9d0-8765-8765-3efg21098765",
+    artistId: 2, // Assuming the second artist will have ID 2
+    albumId: 2, // Assuming the second album will have ID 2
     duration: 198, // 3:18
     genre: "Electronic",
     releaseDate: new Date("2023-07-22"),
@@ -82,11 +74,10 @@ const songs = [
     coverArt: "http://localhost:3000/public/default.png",
   },
   {
-    id: "i9j0k1l2-m3n4-2109-8765-7jkl65432109",
     publicId: nanoid(21),
     title: "Blue Moon Serenade",
-    artistId: "c3d4e5f6-a7b8-6543-8765-1cde09876543",
-    albumId: "f6a7b8c9-d0e1-9876-8765-4ghi32109876",
+    artistId: 3, // Assuming the third artist will have ID 3
+    albumId: 3, // Assuming the third album will have ID 3
     duration: 312, // 5:12
     genre: "Jazz",
     releaseDate: new Date("2021-11-30"),
