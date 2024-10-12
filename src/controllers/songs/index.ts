@@ -44,6 +44,7 @@ export const songsController = new Elysia({
               title: true,
             },
           },
+          _count: { select: { ListeningHistory: true } },
         },
       });
 
@@ -84,6 +85,7 @@ export const songsController = new Elysia({
               title: true,
             },
           },
+          _count: { select: { ListeningHistory: true } },
         },
       });
 
@@ -106,7 +108,7 @@ export const songsController = new Elysia({
     },
   )
   .get(
-    "/:id/stream",
+    "/:publicId/stream",
     async function ({ request, params, set }) {
       const CHUNK_SIZE = 256 * 1024;
       const songId = params.publicId;
@@ -218,5 +220,10 @@ export const songsController = new Elysia({
     },
     {
       params: "songId",
+      detail: {
+        summary: "Record Song Listening",
+        description:
+          "Record the listening history of a user for a specific song",
+      },
     },
   );
