@@ -14,7 +14,6 @@ This is a feature-rich music streaming API built with [Elysia](https://elysia.js
   - [Playlists](#playlists)
   - [Artists](#artists)
 - [Contributing](#contributing)
-- [License](#license)
 
 ## Features
 
@@ -59,6 +58,7 @@ You can interact with the API using tools like [Postman](https://www.postman.com
 
 ## ERD Diagram
 
+![prisma-erd (1)](https://github.com/user-attachments/assets/c877a4f4-bf64-4a63-93f2-4bede94fbe4f)
 
 
 ## API Endpoints
@@ -198,12 +198,3 @@ You can interact with the API using tools like [Postman](https://www.postman.com
 ## Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request for any changes.
-
-## License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
-```
-
-Feel free to customize the `README.md` file further based on your specific needs and preferences.
-```
