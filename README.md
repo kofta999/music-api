@@ -1,6 +1,6 @@
 # Music Streaming API
 
-This is a feature-rich music streaming API built with [Elysia](https://elysia.js.org/), a lightweight and fast web framework for Node.js. The API provides endpoints for user authentication, song search and streaming, playlist management, and artist following.
+This is a feature-rich music streaming API built with [Elysia](https://elysia.js.org/), a lightweight and fast web framework for Bun / Node.js. The API provides endpoints for user authentication, song search and streaming, playlist management, and artist following.
 
 ## Table of Contents
 
@@ -27,7 +27,7 @@ This is a feature-rich music streaming API built with [Elysia](https://elysia.js
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/yourusername/music-api.git
+   git clone https://github.com/kofta999/music-api.git
    cd music-api
    ```
 
